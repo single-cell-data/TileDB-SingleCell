@@ -129,6 +129,18 @@ class TileDBGroup(TileDBObject):
         # This works in with-open-as contexts because tiledb.Group has __enter__ and __exit__ methods.
         return tiledb.Group(self.uri, mode=mode, ctx=self._ctx)
 
+    def _add_uri(self, name: str, child_uri: str):
+        """
+        TODO
+        """
+        relative = self._soma_options.member_uris_are_relative
+        if relative is None:
+            relative = not child_uri.startswith("tiledb://")
+        if relative:
+            child_uri = name
+        with self._open("w") as G:
+            G.add(uri=child_uri, relative=relative, name=name)
+
     def _add_object(self, obj: TileDBObject):
         """
         Adds a SOMA group/array to the current SOMA group -- e.g. base SOMA adding
