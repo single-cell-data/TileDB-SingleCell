@@ -13,7 +13,7 @@ def from_h5ad(soma: tiledbsc.SOMA, input_path: str) -> None:
 
 
 # ----------------------------------------------------------------
-def from_h5ad_update_obs_and_var(soma: tiledbsc.SOMA, input_path: str) -> None:
+def update_obs_and_var_from_h5ad(soma: tiledbsc.SOMA, input_path: str) -> None:
     """
     Rewrites obs and var from the specified .h5ad file, leaving all other data in place. Useful for
     updating schema/compression/etc. within an existing dataset.

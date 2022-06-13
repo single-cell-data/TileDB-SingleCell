@@ -159,13 +159,12 @@ def ingest_one(
             if not os.path.exists(parent):
                 os.mkdir(parent)
 
-    soma = tiledbsc.SOMA(uri=output_path, soma_options=soma_options)
-
     if ifexists == "update_obs_and_var":
         if not os.path.exists(output_path):
             raise Exception("Cannot update; doesn't exist yet:", output_path)
         # Do the ingest into TileDB.
-        tiledbsc.io.from_h5ad_update_obs_and_var(soma, input_path)
+        soma = tiledbsc.SOMA(uri=output_path, soma_options=soma_options)
+        tiledbsc.io.update_obs_and_var_from_h5ad(soma, input_path)
 
     else:
         if os.path.exists(output_path):
@@ -185,7 +184,7 @@ def ingest_one(
                     "Internal coding error in --ifexists handling.", ifexists, "<"
                 )
         # Do the ingest into TileDB.
-        tiledbsc.io.from_h5ad(soma, input_path)
+        tiledbsc.io.from_h5ad(output_path, input_path)
 
     if not verbose:
         print(f"Wrote {output_path}")
