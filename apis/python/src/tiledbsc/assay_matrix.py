@@ -82,7 +82,7 @@ class AssayMatrix(TileDBArray):
             return (num_rows, num_cols)
 
     # ----------------------------------------------------------------
-    def dim_select(self, obs_ids, var_ids) -> pd.DataFrame:
+    def dim_select(self, obs_ids=None, var_ids=None) -> pd.DataFrame:
         """
         Selects a slice out of the matrix with specified `obs_ids` and/or `var_ids`.
         Either or both of the ID lists may be `None`, meaning, do not subselect along

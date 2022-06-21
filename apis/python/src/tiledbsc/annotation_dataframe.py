@@ -179,6 +179,17 @@ class AnnotationDataFrame(TileDBArray):
             return self._ascii_to_unicode_dataframe_readback(slice_df)
 
     # ----------------------------------------------------------------
+    def ids_from_attribute_filter(self, query_string, attrs=None) -> List[str]:
+        """
+        TODO
+        """
+        out = self.attribute_filter(query_string, attrs)
+        if out is None:
+            return []
+        else:
+            return list(out.index)
+
+    # ----------------------------------------------------------------
     def _ascii_to_unicode_dataframe_readback(self, df) -> pd.DataFrame:
         """
         Implements the 'decode on read' partof our logic as noted in `dim_select()`.

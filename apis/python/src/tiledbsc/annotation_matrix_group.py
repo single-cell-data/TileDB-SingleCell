@@ -52,7 +52,14 @@ class AnnotationMatrixGroup(TileDBGroup):
         return ", ".join(f"'{key}'" for key in self.keys())
 
     # ----------------------------------------------------------------
-    def __iter__(self) -> Iterator[AnnotationMatrix]:
+    def dim_select(self, ids=None) -> Dict[str, pd.DataFrame]:
+        """
+        Selects a slice out of the component matrices with specified `obs_ids` or `var_ids`.
+        """
+        return {key: self[key].dim_select(ids) for key in self.keys()}
+
+    # ----------------------------------------------------------------
+    def __iter__(self) -> List[AnnotationMatrix]:
         """
         Implements `for matrix in soma.obsm: ...` and `for matrix in soma.varm: ...`
         """
