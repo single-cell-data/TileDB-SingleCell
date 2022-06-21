@@ -233,9 +233,10 @@ class SOMA(TileDBGroup):
         Supporting method for `get_obs_value_counts` and `get_var_value_counts`.
         """
         attrs = [obs_or_var_label]
-        obs_or_var = self.obs.df(attrs=attrs) if use_obs else self.var.df(attrs=attrs)
-        if obs_or_var_label not in obs_or_var:
+        obs_or_var = self.obs if use_obs else self.var
+        if not obs_or_var_label in obs_or_var.keys():
             return
+        obs_or_var = obs_or_var.df(attrs=attrs)
 
         counts = Counter(obs_or_var[obs_or_var_label])
         name_column = []

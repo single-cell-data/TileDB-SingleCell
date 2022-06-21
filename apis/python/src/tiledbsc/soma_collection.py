@@ -79,10 +79,10 @@ class SOMACollection(TileDBGroup):
         return len(self._get_member_names())
 
     # ----------------------------------------------------------------
-    def map(self, soma_callback, data: Dict = None) -> Dict:
+    def map(self, soma_callback, data_per_soma_name: Dict = None) -> Dict:
         """
         Invokes the callback function/lambda on every SOMA in the collection, and returns a dict
-        from SOMA name to return value of that callback.  If `data` is not `None`, it should be a
+        from SOMA name to return value of that callback.  If `data_per_soma_name` is not `None`, it should be a
         dict from SOMA name to something that should be passed as a callback argument.
 
         Example use: invoke this once with a per-SOMA attribute-filter query and get back a list of
@@ -101,10 +101,13 @@ class SOMACollection(TileDBGroup):
         )
         ```
         """
-        if data is None:
+        if data_per_soma_name is None:
             return {soma.name: soma_callback(soma) for soma in self}
         else:
-            return {soma.name: soma_callback(soma, data[soma.name]) for soma in self}
+            return {
+                soma.name: soma_callback(soma, data_per_soma_name[soma.name])
+                for soma in self
+            }
 
     # ----------------------------------------------------------------
     def add(self, soma: SOMA) -> None:

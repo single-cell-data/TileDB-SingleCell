@@ -21,17 +21,19 @@ print("================================================================")
 for obs_label in obs_labels:
     print()
     print("----------------------------------------------------------------")
-    print("Per-SOMA values for", obs_label)
-    for soma in soco:
+    print("Per-SOMA obs values for", obs_label)
+    # Here we use the soco.map method.
+    counts_by_name = soco.map(lambda soma: soma.get_obs_value_counts(obs_label))
+    for name, counts in counts_by_name.items():
         print()
         print("SOMA", soma.name)
         print(soma.obs.df(attrs=[obs_label]).groupby(obs_label).size())
 
-print("================================================================")
 for var_label in var_labels:
     print()
     print("----------------------------------------------------------------")
-    print("Per-SOMA values for", var_label)
+    print("Per-SOMA var values for", var_label)
+    # Here instead of the soco.map method, we just do 'for soma in soco' -- both work!
     for soma in soco:
         print()
         print("SOMA", soma.name)
@@ -39,6 +41,7 @@ for var_label in var_labels:
 
 print()
 print("================================================================")
+print("Count of SOMAs having each given obs label")
 for obs_label in obs_labels:
     print()
     print("----------------------------------------------------------------")
@@ -70,7 +73,7 @@ print()
 print("================================================================")
 for obs_label in obs_labels:
     print()
-    print("----------------------------------------------------------------")
+    print("================================================================")
     print("Collection-wide counts of values of", obs_label)
     print()
     print("obs_label", obs_label)
