@@ -61,6 +61,15 @@ class AnnotationPairwiseMatrixGroup(TileDBGroup):
         return ", ".join(f"'{key}'" for key in self.keys())
 
     # ----------------------------------------------------------------
+    def dim_select(self, obs_ids=None, var_ids=None) -> Dict[str, pd.DataFrame]:
+        """
+        Selects a slice out of the component matrices with specified `obs_ids` and/or `var_ids`.
+        Either or both of the ID lists may be `None`, meaning, do not subselect along
+        that dimension. If both ID lists are `None`, the entire matrix is returned.
+        """
+        return {key: self[key].dim_select(obs_ids, var_ids) for key in self.keys()}
+
+    # ----------------------------------------------------------------
     def __getattr__(self, name: str) -> Optional[AssayMatrix]:
         """
         This is called on `soma.obsp.name` when `name` is not already an attribute.

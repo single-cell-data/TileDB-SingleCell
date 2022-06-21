@@ -80,6 +80,16 @@ class SOMACollection(TileDBGroup):
         return len(self._get_member_names())
 
     # ----------------------------------------------------------------
+    def map(self, soma_callback, data: Dict = None) -> Dict:
+        """
+        TODO
+        """
+        if data is None:
+            return {soma.name: soma_callback(soma) for soma in self}
+        else:
+            return {soma.name: soma_callback(soma, data[soma.name]) for soma in self}
+
+    # ----------------------------------------------------------------
     def add(self, soma: SOMA) -> None:
         """
         Adds a `SOMA` to the `SOMACollection`.
