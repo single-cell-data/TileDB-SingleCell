@@ -24,9 +24,12 @@ else:
     print(f"{sys.argv[0]}: need just one soma-collection path.", file=sys.stderr)
     sys.exit(1)
 
-soco = tiledbsc.SOMACollection(
-    soco_path, ctx=tiledb.Ctx({"py.init_buffer_bytes": 4 * 1024**3})
-)
+# Use this for full-SOMA, all-at-once queries:
+# ctx = tiledb.Ctx({"py.init_buffer_bytes": 4 * 1024**3})
+# Use this to test return_incomplete=True:
+ctx = tiledb.Ctx({})
+
+soco = tiledbsc.SOMACollection(soco_path, ctx=ctx)
 
 # ----------------------------------------------------------------
 # obs_ids_per_soma = soco.map(
@@ -60,16 +63,35 @@ soco = tiledbsc.SOMACollection(
 # X_dfs = soco.map(lambda soma, obs_ids: soma.X.data.df(obs_ids=obs_ids), obs_ids_per_soma)
 
 # ----------------------------------------------------------------
-# print("TWO-SIDED QUERY")
-# soco_attribute_filter_and_store(
-#     soco=tiledbsc.SOMACollection("/Users/johnkerl/mini-corpus/atlas"),
-#     output_h5ad_path="mini-atlas-two-sided.h5ad",
-#     output_soma_path="mini-atlas-two-sided",
-#     obs_attr_names=["cell_type"],
-#     obs_query_string='cell_type == "B cell"',
-#     var_attr_names=["feature_name"],
-#     var_query_string='feature_name == "MT-CO3"',
+# bruce:
+
+# obs_id_map = soco.filter(dim='obs', 'cell_type == "foobar"')   # returns { soma_name: [obs_id, ...] }
+# obs_df_slices = []
+# for soma_name, obs_ids in obs_id_map.items():
+#     df = soco[soma_name].obs.df[obs_ids]   # returns slice of obs as pandas dataframe
+#     obs_df_slices.append(df)
+# full_result = pandas.concat(obs_df_slices, join="outer")
+
+# obs_ids_per_soma = soco.map(
+#     lambda soma: soma.obs.ids_from_attribute_filter(
+#         query_string='cell_type == "B cell"', attrs=["cell_type"]
+#     )
 # )
+# print()
+# for name, obs_ids in obs_ids_per_soma.items():
+#     print(len(obs_ids), name)
+
+# obs_df_slices = []
+# print()
+# for soma_name, obs_ids in obs_ids_per_soma.items():
+#     print("...", len(obs_ids), soma_name)
+#     df = soco[soma_name].obs.df(ids=obs_ids)  # returns slice of obs as pandas dataframe
+#     obs_df_slices.append(df)
+# full_result = pandas.concat(obs_df_slices, join="outer")
+# print(full_result)
+
+# ----------------------------------------------------------------
+# print("TWO-SIDED QUERY")
 
 # obs_ids_per_soma = soco.map(
 #     lambda soma: soma.obs.ids_from_attribute_filter(
@@ -106,14 +128,7 @@ soco = tiledbsc.SOMACollection(
 #     print(X_df.shape, dense.shape, name)
 
 # ----------------------------------------------------------------
-# bruce:
-
-# obs_id_map = soco.filter(dim='obs', 'cell_type == "foobar"')   # returns { soma_name: [obs_id, ...] }
-# obs_df_slices = []
-# for soma_name, obs_ids in obs_id_map.items():
-#     df = soco[soma_name].obs.df[obs_ids]   # returns slice of obs as pandas dataframe
-#     obs_df_slices.append(df)
-# full_result = pandas.concat(obs_df_slices, join="outer")
+print("PAGINATED QUERY")
 
 obs_ids_per_soma = soco.map(
     lambda soma: soma.obs.ids_from_attribute_filter(
@@ -124,11 +139,11 @@ print()
 for name, obs_ids in obs_ids_per_soma.items():
     print(len(obs_ids), name)
 
-obs_df_slices = []
-print()
-for soma_name, obs_ids in obs_ids_per_soma.items():
-    print("...", len(obs_ids), soma_name)
-    df = soco[soma_name].obs.df(ids=obs_ids)  # returns slice of obs as pandas dataframe
-    obs_df_slices.append(df)
-full_result = pandas.concat(obs_df_slices, join="outer")
-print(full_result)
+for soma in soco:
+    print("================================================================", soma.name)
+    with soma.X.data._open() as A:
+        obs_ids = obs_ids_per_soma[soma.name]
+        iterable = A.query(return_incomplete=True).df[obs_ids, :]
+
+        for result in iterable:
+            print(result.shape)
