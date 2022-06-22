@@ -15,6 +15,14 @@ import tiledbsc
 # Use this for full-SOMA, all-at-once queries:
 ctx = tiledb.Ctx({"py.init_buffer_bytes": 4 * 1024**3})
 
+# ================================================================
+# SOCO for most of these examples: 18 SOMAs, total 9.2GB
+# ================================================================
+
+# ----------------------------------------------------------------
+# Use this for full-SOMA, all-at-once queries:
+ctx = tiledb.Ctx({"py.init_buffer_bytes": 4 * 1024**3})
+
 if len(sys.argv) == 1:
     soco_path = "soma-collection"
 elif len(sys.argv) == 2:
