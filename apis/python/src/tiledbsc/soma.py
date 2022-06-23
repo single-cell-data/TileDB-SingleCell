@@ -234,7 +234,7 @@ class SOMA(TileDBGroup):
         """
         attrs = [obs_or_var_label]
         obs_or_var = self.obs if use_obs else self.var
-        if not obs_or_var_label in obs_or_var.keys():
+        if obs_or_var_label not in obs_or_var.keys():
             return
         obs_or_var = obs_or_var.df(attrs=attrs)
 

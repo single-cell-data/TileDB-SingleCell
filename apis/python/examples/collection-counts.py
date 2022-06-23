@@ -26,8 +26,8 @@ for obs_label in obs_labels:
     counts_by_name = soco.map(lambda soma: soma.get_obs_value_counts(obs_label))
     for name, counts in counts_by_name.items():
         print()
-        print("SOMA", soma.name)
-        print(soma.obs.df(attrs=[obs_label]).groupby(obs_label).size())
+        print("SOMA", name)
+        print(counts)
 
 for var_label in var_labels:
     print()
