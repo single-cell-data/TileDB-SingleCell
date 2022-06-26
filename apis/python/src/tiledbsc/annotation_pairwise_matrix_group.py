@@ -3,7 +3,6 @@ from typing import Dict, Iterator, List, Optional
 
 import pandas as pd
 import scipy.sparse
-import pandas as pd
 import tiledb
 
 import tiledbsc.util as util
