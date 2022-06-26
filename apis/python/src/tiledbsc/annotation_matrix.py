@@ -66,7 +66,7 @@ class AnnotationMatrix(TileDBArray):
             return (num_rows, num_cols)
 
     # ----------------------------------------------------------------
-    def dim_select(self, ids: Optional[Ids]) -> pd.DataFrame:
+    def dim_select(self, ids: Optional[Ids]=None) -> pd.DataFrame:
         """
         Selects a slice out of the array with specified `obs_ids` (for `obsm` elements) or
         `var_ids` (for `varm` elements).  If `ids` is `None`, the entire array is returned.

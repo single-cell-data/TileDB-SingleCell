@@ -1,5 +1,6 @@
 from typing import Iterator, Optional, Sequence
 
+import pandas as pd
 import tiledb
 
 from .annotation_dataframe import AnnotationDataFrame

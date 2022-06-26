@@ -82,7 +82,25 @@ class SOMACollection(TileDBGroup):
     # ----------------------------------------------------------------
     def map(self, soma_callback, data: Dict = None) -> Dict:
         """
-        TODO
+        Invokes the callback function/lambda on every SOMA in the collection, and returns a dict
+        from SOMA name to return value of that callback.  If `data` is not `None`, it should be a
+        dict from SOMA name to something that should be passed as a callback argument.
+
+        Example use: invoke this once with a per-SOMA attribute-filter query and get back a list of
+        obs IDs per SOMA. Invoke this again with a lambda that does something with each SOMA's obs
+        IDs.
+
+        ```
+        obs_ids_per_soma = soco.map(
+            lambda soma: soma.obs.ids_from_query(
+                query_string='cell_type == "pericyte cell"', attrs=["cell_type"]
+            )
+        )
+
+        X_dfs = soco.map(
+            lambda soma, obs_ids: soma.X.data.df(obs_ids=obs_ids), obs_ids_per_soma
+        )
+        ```
         """
         if data is None:
             return {soma.name: soma_callback(soma) for soma in self}
