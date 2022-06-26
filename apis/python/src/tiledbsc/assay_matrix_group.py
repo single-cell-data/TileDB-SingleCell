@@ -1,5 +1,6 @@
-from typing import Iterator, List, Optional
+from typing import Iterator, Dict, List, Optional
 
+import pandas as pd
 import tiledb
 
 from .annotation_dataframe import AnnotationDataFrame

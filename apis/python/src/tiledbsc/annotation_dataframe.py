@@ -109,7 +109,7 @@ class AnnotationDataFrame(TileDBArray):
         return set(self.keys())
 
     # ----------------------------------------------------------------
-    def dim_select(self, ids, attrs=None) -> pd.DataFrame:
+    def dim_select(self, ids=None, attrs=None) -> pd.DataFrame:
         """
         Selects a slice out of the dataframe with specified `obs_ids` (for `obs`) or `var_ids` (for
         `var`).  If `ids` is `None`, the entire dataframe is returned.  Similarly, if `attrs` are
@@ -179,7 +179,7 @@ class AnnotationDataFrame(TileDBArray):
             return self._ascii_to_unicode_dataframe_readback(slice_df)
 
     # ----------------------------------------------------------------
-    def ids_from_attribute_filter(self, query_string, attrs=None) -> List[str]:
+    def ids_from_query(self, query_string, attrs=None) -> List[str]:
         """
         TODO
         """

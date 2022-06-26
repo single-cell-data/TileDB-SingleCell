@@ -1,6 +1,7 @@
 import os
 from typing import Dict, Iterator, List, Optional
 
+import pandas as pd
 import scipy.sparse
 import tiledb
 
