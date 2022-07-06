@@ -1,4 +1,4 @@
-from typing import Iterator, Optional, Sequence
+from typing import Dict, Iterator, Optional, Sequence
 
 import pandas as pd
 import tiledb

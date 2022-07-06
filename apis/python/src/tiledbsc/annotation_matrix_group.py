@@ -1,5 +1,5 @@
 import os
-from typing import Dict, Iterator, Optional, Sequence, Union
+from typing import Dict, List, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd

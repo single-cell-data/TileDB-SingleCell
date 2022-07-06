@@ -1,4 +1,4 @@
-from typing import Iterator, Optional, Sequence, Set, Union
+from typing import Dict, Iterator, Optional, Sequence, Set, Union
 
 import tiledb
 
