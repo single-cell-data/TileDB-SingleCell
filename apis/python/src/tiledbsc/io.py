@@ -30,6 +30,7 @@ def from_h5ad(soma: tiledbsc.SOMA, input_path: Path) -> None:
     """
     Reads an .h5ad file and writes to a TileDB group structure.
     """
+    print("AAA002")
     _from_h5ad_common(soma, input_path, from_anndata)
 
 
@@ -130,6 +131,7 @@ def from_anndata(soma: tiledbsc.SOMA, anndata: ad.AnnData) -> None:
     Top-level writer method for creating a TileDB group for a SOMA object.
     """
 
+    print("AAA003")
     # Without _at least_ an index, there is nothing to indicate the dimension indices.
     if anndata.obs.index.empty or anndata.var.index.empty:
         raise NotImplementedError("Empty AnnData.obs or AnnData.var unsupported.")
@@ -160,6 +162,7 @@ def from_anndata(soma: tiledbsc.SOMA, anndata: ad.AnnData) -> None:
     soma._add_object(soma.var)
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    print("AAA004")
     soma.X.add_layer_from_matrix_and_dim_values(
         matrix=anndata.X,
         row_names=anndata.obs.index,

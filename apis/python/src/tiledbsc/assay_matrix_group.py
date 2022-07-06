@@ -151,6 +151,7 @@ class AssayMatrixGroup(TileDBGroup):
         `anndata.var_names` or `anndata.raw.var_names`.  For `obsp` elements, both will
         be `anndata.obs_names`; for `varp elements, both will be `anndata.var_names`.
         """
+        print("AAA005")
 
         if matrix is not None:
             # Must be done first, to create the parent directory

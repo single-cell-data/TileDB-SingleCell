@@ -236,6 +236,7 @@ def ingest_one(
                     "Internal coding error in --ifexists handling.", ifexists, "<"
                 )
         # Do the ingest into TileDB.
+        print("AAA001")
         tiledbsc.io.from_h5ad(soma, input_path)
 
     tiledbsc.logging.logger.info(f"Wrote {output_path}")

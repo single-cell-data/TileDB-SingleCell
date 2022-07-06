@@ -157,6 +157,7 @@ class AssayMatrix(TileDBArray):
         `scipy.sparse.csr_matrix`, `scipy.sparse.csc_matrix`, `numpy.ndarray`, etc.
         For ingest from `AnnData`, these should be `ann.obs_names` and `ann.var_names`.
         """
+        print("AAA010")
 
         s = util.get_start_stamp()
         log_io(None, f"{self._indent}START  WRITING {self.uri}")
@@ -173,8 +174,10 @@ class AssayMatrix(TileDBArray):
             col_names = np.asarray(col_names)
 
         if self.exists():
+            print("AAA011")
             log_io(None, f"{self._indent}Re-using existing array {self.uri}")
         else:
+            print("AAA012")
             self._create_empty_array(matrix_dtype=matrix.dtype)
 
         self._set_object_type_metadata()
@@ -198,7 +201,12 @@ class AssayMatrix(TileDBArray):
         Create a TileDB 2D sparse array with string dimensions and a single attribute.
         """
 
+        print("AAA012")
         level = self._soma_options.string_dim_zstd_level
+        # XXX TEMP
+        second_dim_filters = [tiledb.ZstdFilter(level=level)]
+        # XXX TEMP
+        second_dim_filters = [tiledb.DictionaryFilter()]
         dom = tiledb.Domain(
             tiledb.Dim(
                 name=self.row_dim_name,
@@ -210,7 +218,7 @@ class AssayMatrix(TileDBArray):
                 name=self.col_dim_name,
                 domain=(None, None),
                 dtype="ascii",
-                filters=[tiledb.ZstdFilter(level=level)],
+                filters=second_dim_filters,
             ),
             ctx=self._ctx,
         )
