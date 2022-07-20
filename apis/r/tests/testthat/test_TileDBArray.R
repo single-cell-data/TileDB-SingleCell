@@ -60,7 +60,7 @@ test_that("TileDBArray helper functions", {
 
   # verify selected ranges were set
   expect_equal(
-    selected_ranges(tdb$object),
+    tiledb::selected_ranges(tdb$object),
     list(Dept = cbind(c("A", "B"), c("A", "B")))
   )
 

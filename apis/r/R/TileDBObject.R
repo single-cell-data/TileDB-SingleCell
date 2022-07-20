@@ -21,8 +21,7 @@ TileDBObject <- R6::R6Class(
     #' @param ctx optional TileDB context
     initialize = function(uri, verbose = TRUE, config = NULL, ctx = NULL) {
       if (missing(uri)) stop("A `uri` must be specified")
-      private$tiledb_uri <- Tile
-      DBURI$new(uri)
+      private$tiledb_uri <- TileDBURI$new(uri)
       self$verbose <- verbose
       self$config <- config
       self$ctx <- ctx
