@@ -35,7 +35,9 @@ Imports:
     R6,
     methods,
     Matrix,
+    bit64,
     tiledb (>= 0.14.0),
+    arrow,
     SeuratObject,
     jsonlite,
     glue,
@@ -44,7 +46,7 @@ Imports:
     urltools,
     vctrs
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Suggests:
     rmarkdown,
     knitr,
