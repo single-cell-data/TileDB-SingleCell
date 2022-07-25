@@ -42,16 +42,6 @@ TileDBArray <- R6::R6Class(
       }
     },
 
-    #' @description Check if the array exists.
-    #' @return TRUE if the array exists, FALSE otherwise.
-    array_exists = function() {
-      .Deprecated(
-        new = "exists()",
-        old = "array_exists()"
-      )
-      self$exists()
-    },
-
     #' @description Return a [`TileDBArray`] object
     #' @param ... Optional arguments to pass to `tiledb::tiledb_array()`
     #' @return A [`tiledb::tiledb_array`] object.
