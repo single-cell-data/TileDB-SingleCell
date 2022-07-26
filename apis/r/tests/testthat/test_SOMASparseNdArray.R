@@ -8,4 +8,7 @@ test_that("SOMASparseNdArray creation", {
 
   expect_equal(ndarray$attrnames(), "data")
   expect_equal(tiledb::datatype(ndarray$attributes()$data), "INT32")
+
+  mat <- create_sparse_matrix_with_int_dims(10, 10)
+  ndarray$write(mat)
 })

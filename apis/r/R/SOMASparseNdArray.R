@@ -13,6 +13,11 @@
 #' **Note** - on TileDB this is an sparse array with `N` uint64 dimensions of
 #' domain [0, maxUint64), and a single attribute.
 #'
+#' ## Duplicate writes
+#'
+#' As duplicate index values are not allowed, index values already present in
+#' the object are overwritten and new index values are added.
+#'
 #' @importFrom bit64 as.integer64
 
 SOMASparseNdArray <- R6::R6Class(
@@ -73,6 +78,41 @@ SOMASparseNdArray <- R6::R6Class(
 
       # create array
       tiledb::tiledb_array_create(uri = self$uri, schema = tdb_schema)
+    },
+
+    #' @description Write matrix-like data to the array.
+    #'
+    #' @param data Any `matrix`-like object coercible to a
+    #' [`TsparseMatrix`][`Matrix::TsparseMatrix-class`]. Character dimension
+    #' names are ignored because `SOMANdArray`'s use integer indexing.
+    #'
+    write = function(data) {
+      stopifnot(
+        "'data' must be a matrix" = is_matrix(data)
+      )
+      # coerce to a TsparseMatrix, which uses 0-based COO indexing
+      data <- as(data, Class = "TsparseMatrix")
+      coo <- data.frame(
+        i = bit64::as.integer64(data@i),
+        j = bit64::as.integer64(data@j),
+        x = data@x
+      )
+      colnames(coo) <- c(self$dimnames(), self$attrnames())
+      private$write_coo_dataframe(coo)
+    }
+  ),
+
+  private = list(
+
+    # @description Ingest COO-formatted dataframe into the TileDB array.
+    # @param x A [`data.frame`].
+    write_coo_dataframe = function(data) {
+      stopifnot(is.data.frame(data))
+      # private$log_array_ingestion()
+      on.exit(private$close())
+      private$open("WRITE")
+      arr <- self$object
+      arr[] <- data
     }
   )
 )
