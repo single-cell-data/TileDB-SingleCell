@@ -15,24 +15,6 @@ TileDBArray <- R6::R6Class(
   inherit = TileDBObject,
   public = list(
 
-    #' @description Create a new TileDBArray object.
-    #' @param uri URI for the TileDB array
-    #' @param verbose Print status messages
-    #' @param config optional configuration
-    #' @param ctx optional tiledb context
-    initialize = function(uri, verbose = TRUE, config = NULL, ctx = NULL) {
-      super$initialize(uri, verbose, config, ctx)
-
-      if (self$exists()) {
-        msg <- sprintf("Found existing %s at '%s'", self$class(), self$uri)
-        private$initialize_object()
-      } else {
-        msg <- sprintf("No %s found at '%s'", self$class(), self$uri)
-      }
-      if (self$verbose) message(msg)
-      return(self)
-    },
-
     #' @description Print summary of the array.
     print = function() {
       super$print()
