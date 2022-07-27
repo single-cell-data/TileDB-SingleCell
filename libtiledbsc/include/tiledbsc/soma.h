@@ -3,9 +3,10 @@
 
 #include <stdexcept>  // for windows: error C2039: 'runtime_error': is not a member of 'std'
 
+#include <mutex>
+
 #include <tiledb/tiledb>
 #include <tiledb/tiledb_experimental>
-
 #include "tiledbsc/soma_query.h"
 
 namespace tiledbsc {
@@ -106,6 +107,9 @@ class SOMA {
 
     // Flag that is true if TileDB Cloud URIs were converted to relative URIs
     bool group_uri_override_ = false;
+
+    // Mutex to control parallel access
+    std::mutex mtx_;
 
     /**
      * @brief Walk the TileDB group tree to discover arrays and populate the

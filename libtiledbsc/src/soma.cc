@@ -28,28 +28,34 @@ SOMA::SOMA(std::string_view uri, std::shared_ptr<Context> ctx)
 }
 
 std::unordered_map<std::string, std::string> SOMA::list_arrays() {
-    LOG_DEBUG(fmt::format("Listing arrays in SOMA '{}'", uri_));
+    // Allow only one thread to list the arrays
+    std::lock_guard<std::mutex> lock(mtx_);
 
     if (array_uri_map_.empty()) {
-        // TODO: handle bad uri_
-        Group group(*ctx_, uri_, TILEDB_READ);
-        build_uri_map(group);
+        LOG_DEBUG(fmt::format("Listing arrays in SOMA '{}'", uri_));
+
+        try {
+            Group group(*ctx_, uri_, TILEDB_READ);
+            build_uri_map(group);
+        } catch (const std::exception& e) {
+            throw TileDBSCError(fmt::format(
+                "[SOMA] Error opening group URI='{}' : {}", uri_, e.what()));
+        }
     }
     return array_uri_map_;
 }
 
 std::shared_ptr<Array> SOMA::open_array(const std::string& name) {
-    if (array_uri_map_.empty()) {
-        list_arrays();
-    }
+    // TODO: add option to open array without listing all arrays
+    list_arrays();
     auto uri = array_uri_map_[name];
     LOG_DEBUG(fmt::format("Opening array '{}' from SOMA '{}'", name, uri_));
 
     try {
         return std::make_shared<Array>(*ctx_, uri, TILEDB_READ);
     } catch (const std::exception& e) {
-        throw TileDBSCError(fmt::format(
-            "[SOMA] Error opening array '{}' : {}", name, e.what()));
+        throw TileDBSCError(
+            fmt::format("[SOMA] Error opening array '{}' : {}", uri, e.what()));
     }
 }
 
@@ -67,8 +73,15 @@ void SOMA::build_uri_map(Group& group, std::string_view parent) {
 
         if (member.type() == Object::Type::Group) {
             // Member is a group, call recursively
-            auto subgroup = Group(*ctx_, member.uri(), TILEDB_READ);
-            build_uri_map(subgroup, path);
+            try {
+                auto subgroup = Group(*ctx_, member.uri(), TILEDB_READ);
+                build_uri_map(subgroup, path);
+            } catch (const std::exception& e) {
+                throw TileDBSCError(fmt::format(
+                    "[SOMA] Error opening group URI='{}' : {}",
+                    uri_,
+                    e.what()));
+            }
         } else {
             auto uri = member.uri();
             if (util::is_tiledb_uri(uri) && !util::is_tiledb_uri(uri_)) {
