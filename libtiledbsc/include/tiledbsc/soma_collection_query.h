@@ -106,13 +106,9 @@ class SOMACollectionQuery {
      * incomplete queries, continue to call `next_results` until std::nullopt is
      * returned.
      *
-     * @return std::optional<
-     * std::unordered_map<std::string, std::shared_ptr<ColumnBuffer>>> Results
-     * or std::nullopt if the query is complete.
+     * @return std::optional<SOCOBuffers> Results or std::nullopt
      */
-    std::optional<
-        std::unordered_map<std::string, std::shared_ptr<ColumnBuffer>>>
-    next_results();
+    std::optional<SOCOBuffers> next_results();
 
    private:
     // Map of SOMA name -> SOMAQuery

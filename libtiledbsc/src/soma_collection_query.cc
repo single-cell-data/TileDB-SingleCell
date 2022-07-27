@@ -17,8 +17,7 @@ SOMACollectionQuery::SOMACollectionQuery(SOMACollection* soco) {
     }
 }
 
-std::optional<std::unordered_map<std::string, std::shared_ptr<ColumnBuffer>>>
-SOMACollectionQuery::next_results() {
+std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
     submitted_ = true;
 
     LOG_DEBUG(fmt::format("[SOMACollectionQuery] Start queries."));

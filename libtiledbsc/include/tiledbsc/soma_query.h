@@ -98,9 +98,9 @@ class SOMAQuery {
      * incomplete queries, continue to call `next_results` until std::nullopt is
      * returned.
      *
-     * @return std::optional<ColumnBuffers> Results or std::nullopt
+     * @return std::optional<ArrayBuffers> Results or std::nullopt
      */
-    std::optional<ColumnBuffers> next_results();
+    std::optional<ArrayBuffers> next_results();
 
    private:
     // TileDB context

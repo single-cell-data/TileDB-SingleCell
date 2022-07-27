@@ -15,8 +15,17 @@ using namespace tiledb;
 
 class ColumnBuffer;  // forward declaration
 
-// Map of column name to ColumnBuffer.
-using ColumnBuffers = std::map<std::string, std::shared_ptr<ColumnBuffer>>;
+// Using map instead of unordered map to preserve lexigraphical ordering.
+// However, we may want to preserve the order of insertion instead.
+
+// Map: column name -> ColumnBuffer
+using ArrayBuffers = std::map<std::string, std::shared_ptr<ColumnBuffer>>;
+
+// Map: array name -> ArrayBuffers
+using SOMABuffers = std::map<std::string, ArrayBuffers>;
+
+// Map: SOMA name -> SOMABuffers
+using SOCOBuffers = std::map<std::string, SOMABuffers>;
 
 /**
  * @brief Class to store data for a TileDB dimension or attribute.

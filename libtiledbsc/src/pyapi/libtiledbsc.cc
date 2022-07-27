@@ -30,12 +30,12 @@ py::object to_array(ColumnBuffer& cb) {
 }
 
 /**
- * @brief Convert ColumnBuffers to Arrow table.
+ * @brief Convert ArrayBuffers to Arrow table.
  *
- * @param cbs ColumnBuffers
+ * @param cbs ArrayBuffers
  * @return py::object
  */
-py::object to_table(ColumnBuffers& cbs) {
+py::object to_table(ArrayBuffers& cbs) {
     auto pa = py::module::import("pyarrow");
     auto pa_table_from_arrays = pa.attr("Table").attr("from_arrays");
 
@@ -146,11 +146,7 @@ PYBIND11_MODULE(libtiledbsc, m) {
     //===============================================================
     // Code below is provided for testing
     //===============================================================
-    m.def(
-        "to_arrow",
-        [](std::map<std::string, std::shared_ptr<ColumnBuffer>> tb) {
-            return to_table(tb);
-        });
+    m.def("to_arrow", [](ArrayBuffers tb) { return to_table(tb); });
 
     py::class_<ColumnBuffer, std::shared_ptr<ColumnBuffer>>(m, "ColumnBuffer")
         .def(

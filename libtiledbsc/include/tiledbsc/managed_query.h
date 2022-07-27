@@ -191,10 +191,9 @@ class ManagedQuery {
     /**
      * @brief Return results from the query.
      *
-     * @return ColumnBuffers
-     * Results
+     * @return ArrayBuffers Results
      */
-    ColumnBuffers results() {
+    ArrayBuffers results() {
         return buffers_;
     }
 
@@ -245,7 +244,7 @@ class ManagedQuery {
     size_t total_num_cells_ = 0;
 
     // Map of column name to ColumnBuffer.
-    ColumnBuffers buffers_;
+    ArrayBuffers buffers_;
 };
 
 };  // namespace tiledbsc

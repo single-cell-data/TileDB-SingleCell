@@ -2,6 +2,8 @@
 #include <tiledb/tiledb>
 #include <tiledbsc/tiledbsc>
 
+#define VERBOSE 0
+
 #ifndef TILEDBSC_SOURCE_ROOT
 #define TILEDBSC_SOURCE_ROOT "not_defined"
 #endif
@@ -13,7 +15,9 @@ using namespace tiledb;
 using namespace tiledbsc;
 
 TEST_CASE("SOMA: Open arrays") {
-    LOG_CONFIG("debug");
+    if (VERBOSE) {
+        LOG_CONFIG("debug");
+    }
 
     Config config;
     // config.logging_level"] = "5";

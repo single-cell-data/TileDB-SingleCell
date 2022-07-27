@@ -29,7 +29,7 @@ SOMAQuery::SOMAQuery(SOMA* soma)
     pool.wait_all(tasks).ok();
 }
 
-std::optional<ColumnBuffers> SOMAQuery::next_results() {
+std::optional<ArrayBuffers> SOMAQuery::next_results() {
     // Query is complete, return empty results
     if (empty_ || mq_x_->status() == Query::Status::COMPLETE) {
         return std::nullopt;
