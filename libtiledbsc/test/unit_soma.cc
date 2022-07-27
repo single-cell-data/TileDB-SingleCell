@@ -13,6 +13,8 @@ using namespace tiledb;
 using namespace tiledbsc;
 
 TEST_CASE("SOMA: Open arrays") {
+    LOG_CONFIG("debug");
+
     Config config;
     // config.logging_level"] = "5";
 

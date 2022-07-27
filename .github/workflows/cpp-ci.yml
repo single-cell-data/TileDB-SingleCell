@@ -1,9 +1,11 @@
 name: TileDB-SingleCell C++ CI
 
-on:
-  pull_request:
-  push:
-    branches: [main]
+# TODO: remove after debugging
+on: [push, pull_request]
+#on:
+#  pull_request:
+#  push:
+#    branches: [main]
 
 jobs:
   build:
@@ -19,8 +21,8 @@ jobs:
           - runs-on: ubuntu-latest
             cc: gcc-10
             cxx: g++-10
-    env:
-      MACOSX_DEPLOYMENT_TARGET: 10.14
+#    env:
+#      MACOSX_DEPLOYMENT_TARGET: 10.14
 
     steps:
     - name: 'Print env'
@@ -80,4 +82,4 @@ jobs:
         cd -
         export PYTHONPATH=$PWD/dist/lib
         export LD_LIBRARY_PATH=$PWD/dist/lib
-        pytest -v --durations=0 libtiledbsc
+        pytest -sv --durations=0 libtiledbsc
