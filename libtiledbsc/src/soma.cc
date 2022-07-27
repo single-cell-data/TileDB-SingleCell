@@ -44,7 +44,13 @@ std::shared_ptr<Array> SOMA::open_array(const std::string& name) {
     }
     auto uri = array_uri_map_[name];
     LOG_DEBUG(fmt::format("Opening array '{}' from SOMA '{}'", name, uri_));
-    return std::make_shared<Array>(*ctx_, uri, TILEDB_READ);
+
+    try {
+        return std::make_shared<Array>(*ctx_, uri, TILEDB_READ);
+    } catch (const std::exception& e) {
+        throw TileDBSCError(fmt::format(
+            "[SOMA] Error opening array '{}' : {}", name, e.what()));
+    }
 }
 
 //===================================================================

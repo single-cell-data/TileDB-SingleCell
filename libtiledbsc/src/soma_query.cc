@@ -9,24 +9,30 @@ using namespace tiledb;
 
 SOMAQuery::SOMAQuery(SOMA* soma)
     : ctx_(soma->context()) {
-    std::vector<ThreadPool::Task> tasks;
-    ThreadPool pool{3};
+    if (false) {
+        std::vector<ThreadPool::Task> tasks;
+        ThreadPool pool{3};
 
-    tasks.emplace_back(pool.execute([&]() {
+        tasks.emplace_back(pool.execute([&]() {
+            mq_obs_ = std::make_unique<ManagedQuery>(soma->open_array("obs"));
+            return Status::Ok();
+        }));
+
+        tasks.emplace_back(pool.execute([&]() {
+            mq_var_ = std::make_unique<ManagedQuery>(soma->open_array("var"));
+            return Status::Ok();
+        }));
+        tasks.emplace_back(pool.execute([&]() {
+            mq_x_ = std::make_unique<ManagedQuery>(soma->open_array("X/data"));
+            return Status::Ok();
+        }));
+
+        pool.wait_all(tasks).ok();
+    } else {
         mq_obs_ = std::make_unique<ManagedQuery>(soma->open_array("obs"));
-        return Status::Ok();
-    }));
-
-    tasks.emplace_back(pool.execute([&]() {
         mq_var_ = std::make_unique<ManagedQuery>(soma->open_array("var"));
-        return Status::Ok();
-    }));
-    tasks.emplace_back(pool.execute([&]() {
         mq_x_ = std::make_unique<ManagedQuery>(soma->open_array("X/data"));
-        return Status::Ok();
-    }));
-
-    pool.wait_all(tasks).ok();
+    }
 }
 
 std::optional<ColumnBuffers> SOMAQuery::next_results() {
