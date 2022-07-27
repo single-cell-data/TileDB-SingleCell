@@ -29,7 +29,7 @@ SOMAQuery::SOMAQuery(SOMA* soma)
     pool.wait_all(tasks).ok();
 }
 
-std::optional<ArrayBuffers> SOMAQuery::next_results() {
+std::optional<SOMABuffers> SOMAQuery::next_results() {
     // Query is complete, return empty results
     if (empty_ || mq_x_->status() == Query::Status::COMPLETE) {
         return std::nullopt;
@@ -75,7 +75,15 @@ std::optional<ArrayBuffers> SOMAQuery::next_results() {
     auto num_cells = mq_x_->submit();
     LOG_DEBUG(fmt::format("*** X cells read = {}", num_cells));
 
-    return mq_x_->results();
+    // Save results in SOMABuffers
+    // TODO: add obs and var results
+    results_.clear();
+
+    if (!mq_x_->results().empty()) {
+        results_["X/data"] = mq_x_->results();
+    }
+
+    return results_;
 }
 
 void SOMAQuery::query_and_select(

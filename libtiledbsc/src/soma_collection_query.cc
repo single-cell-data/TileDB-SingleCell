@@ -39,7 +39,49 @@ std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
 
     LOG_DEBUG(fmt::format("[SOMACollectionQuery] Queries done."));
 
-    return std::nullopt;
+    SOCOBuffers results;
+
+    for (auto& [name, sq] : soma_queries_) {
+        if (sq->results().has_value()) {
+            LOG_DEBUG(fmt::format(
+                "[SOMACollectionQuery] SOMA {} has {} results.",
+                name,
+                sq->results()->size()));
+            results[name] = *sq->results();
+        }
+    }
+
+    if (results.empty()) {
+        return std::nullopt;
+    }
+    return results;
 }
+
+/*
+std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
+    submitted_ = true;
+
+    SOCOBuffers results;
+
+    for (auto& [name, sq] : soma_queries_) {
+        LOG_DEBUG(fmt::format("[SOMACollectionQuery] Run query for {}", name));
+        auto soma_results = sq->next_results();
+
+        if (soma_results.has_value()) {
+            results[name] = *sq->next_results();
+        }
+    }
+
+    LOG_DEBUG(fmt::format(
+        "[SOMACollectionQuery] Queries done. SOMA result count = {}",
+        results.size()));
+
+    if (results.empty()) {
+        return std::nullopt;
+    }
+
+    return results;
+}
+*/
 
 }  // namespace tiledbsc

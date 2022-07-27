@@ -98,9 +98,16 @@ class SOMAQuery {
      * incomplete queries, continue to call `next_results` until std::nullopt is
      * returned.
      *
-     * @return std::optional<ArrayBuffers> Results or std::nullopt
+     * @return std::optional<SOMABuffers> Results or std::nullopt
      */
-    std::optional<ArrayBuffers> next_results();
+    std::optional<SOMABuffers> next_results();
+
+    std::optional<SOMABuffers> results() {
+        if (results_.empty()) {
+            return std::nullopt;
+        }
+        return results_;
+    }
 
    private:
     // TileDB context
@@ -114,6 +121,9 @@ class SOMAQuery {
 
     // Managed query for the X array
     std::unique_ptr<ManagedQuery> mq_x_;
+
+    // Results of last call to next_results.
+    SOMABuffers results_;
 
     // Mutex to control access to mq_x_
     std::mutex mtx_;

@@ -119,7 +119,7 @@ PYBIND11_MODULE(libtiledbsc, m) {
         .def("next_results", [](SOMAQuery& sq) -> std::optional<py::object> {
             auto buffers = sq.next_results();
             if (buffers.has_value()) {
-                return to_table(*buffers);
+                return to_table(buffers->at("X/data"));
             }
             return std::nullopt;
         });
