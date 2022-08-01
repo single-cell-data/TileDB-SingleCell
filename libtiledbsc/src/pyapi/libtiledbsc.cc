@@ -105,7 +105,7 @@ PYBIND11_MODULE(libtiledbsc, m) {
             "config"_a = py::none())
         .def("list_arrays", &SOMA::list_arrays)
         // SOMAQuery (0 = return value) will keep SOMA alive (1 = this)
-        .def("query", &SOMA::query, py::keep_alive<0, 1>());
+        .def("query", &SOMA::query, py::keep_alive<0, 1>(), "name"_a = "soma");
 
     py::class_<SOMAQuery>(m, "SOMAQuery")
         .def("select_obs_attrs", &SOMAQuery::select_obs_attrs)
