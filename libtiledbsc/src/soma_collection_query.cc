@@ -13,11 +13,11 @@ SOMACollectionQuery::SOMACollectionQuery(SOMACollection* soco) {
 
     for (auto& [name, soma] : soco->get_somas()) {
         LOG_DEBUG(fmt::format("Get SOMA query: {}", name));
-        soma_queries_[name] = soma->query(name);
+        soma_queries_.push_back(soma->query(name));
     }
 }
 
-std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
+std::optional<MultiArrayBuffers> SOMACollectionQuery::next_results() {
     submitted_ = true;
 
     LOG_DEBUG(fmt::format("[SOMACollectionQuery] Start queries."));
@@ -25,10 +25,10 @@ std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
     std::vector<ThreadPool::Task> tasks;
     ThreadPool pool{threads_};
 
-    for (auto& [name, sq] : soma_queries_) {
+    for (auto& sq : soma_queries_) {
         if (!sq->is_complete()) {
-            LOG_DEBUG(
-                fmt::format("[SOMACollectionQuery] Queue query for {}", name));
+            LOG_DEBUG(fmt::format(
+                "[SOMACollectionQuery] Queue query for {}", sq->name()));
             tasks.emplace_back(pool.execute([&]() {
                 sq->next_results();
                 return Status::Ok();
@@ -41,15 +41,17 @@ std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
 
     LOG_DEBUG(fmt::format("[SOMACollectionQuery] Queries done."));
 
-    SOCOBuffers results;
+    MultiArrayBuffers results;
 
-    for (auto& [name, sq] : soma_queries_) {
+    for (auto& sq : soma_queries_) {
         if (sq->results().has_value()) {
             LOG_DEBUG(fmt::format(
                 "[SOMACollectionQuery] SOMA {} has {} results.",
-                name,
+                sq->name(),
                 sq->results()->begin()->second.begin()->second->size()));
-            results[name] = *sq->results();
+
+            // Merge soma query results into results to be returned
+            results.merge(*sq->results());
         }
     }
 
@@ -58,32 +60,5 @@ std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
     }
     return results;
 }
-
-/*
-std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
-    submitted_ = true;
-
-    SOCOBuffers results;
-
-    for (auto& [name, sq] : soma_queries_) {
-        LOG_DEBUG(fmt::format("[SOMACollectionQuery] Run query for {}", name));
-        auto soma_results = sq->next_results();
-
-        if (soma_results.has_value()) {
-            results[name] = *sq->next_results();
-        }
-    }
-
-    LOG_DEBUG(fmt::format(
-        "[SOMACollectionQuery] Queries done. SOMA result count = {}",
-        results.size()));
-
-    if (results.empty()) {
-        return std::nullopt;
-    }
-
-    return results;
-}
-*/
 
 }  // namespace tiledbsc

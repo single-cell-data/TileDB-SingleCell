@@ -41,7 +41,7 @@ class SOMACollectionQuery {
      * @param attr_names Vector of attribute names.
      */
     void select_obs_attrs(std::vector<std::string>& attr_names) {
-        for (auto& [name, sq] : soma_queries_) {
+        for (auto& sq : soma_queries_) {
             sq->select_obs_attrs(attr_names);
         }
     }
@@ -52,7 +52,7 @@ class SOMACollectionQuery {
      * @param attr_names Vector of attribute names.
      */
     void select_var_attrs(std::vector<std::string>& attr_names) {
-        for (auto& [name, sq] : soma_queries_) {
+        for (auto& sq : soma_queries_) {
             sq->select_var_attrs(attr_names);
         }
     }
@@ -63,7 +63,7 @@ class SOMACollectionQuery {
      * @param ids Vector of obs_id values.
      */
     void select_obs_ids(std::vector<std::string>& ids) {
-        for (auto& [name, sq] : soma_queries_) {
+        for (auto& sq : soma_queries_) {
             sq->select_obs_ids(ids);
         }
     }
@@ -74,7 +74,7 @@ class SOMACollectionQuery {
      * @param ids Vector of var_id values.
      */
     void select_var_ids(std::vector<std::string>& ids) {
-        for (auto& [name, sq] : soma_queries_) {
+        for (auto& sq : soma_queries_) {
             sq->select_var_ids(ids);
         }
     }
@@ -85,7 +85,7 @@ class SOMACollectionQuery {
      * @param qc TIleDB QueryCondition.
      */
     void set_obs_condition(QueryCondition& qc) {
-        for (auto& [name, sq] : soma_queries_) {
+        for (auto& sq : soma_queries_) {
             sq->set_obs_condition(qc);
         }
     }
@@ -96,7 +96,7 @@ class SOMACollectionQuery {
      * @param qc TIleDB QueryCondition.
      */
     void set_var_condition(QueryCondition& qc) {
-        for (auto& [name, sq] : soma_queries_) {
+        for (auto& sq : soma_queries_) {
             sq->set_var_condition(qc);
         }
     }
@@ -106,13 +106,13 @@ class SOMACollectionQuery {
      * incomplete queries, continue to call `next_results` until std::nullopt is
      * returned.
      *
-     * @return std::optional<SOCOBuffers> Results or std::nullopt
+     * @return std::optional<MultiArrayBuffers> Results or std::nullopt
      */
-    std::optional<SOCOBuffers> next_results();
+    std::optional<MultiArrayBuffers> next_results();
 
    private:
     // Map of SOMA name -> SOMAQuery
-    std::unordered_map<std::string, std::unique_ptr<SOMAQuery>> soma_queries_;
+    std::vector<std::unique_ptr<SOMAQuery>> soma_queries_;
 
     // If true, the query has been submitted
     bool submitted_ = false;

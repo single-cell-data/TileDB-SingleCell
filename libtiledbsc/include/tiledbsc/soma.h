@@ -76,9 +76,10 @@ class SOMA {
     /**
      * @brief Create a SOMAQuery for this SOMA.
      *
+     * @param name SOMA name
      * @return std::unique_ptr<SOMAQuery> A SOMA query
      */
-    std::unique_ptr<SOMAQuery> query(std::string name = "soma") {
+    std::unique_ptr<SOMAQuery> query(std::string name = "") {
         return std::make_unique<SOMAQuery>(this, name);
     }
 

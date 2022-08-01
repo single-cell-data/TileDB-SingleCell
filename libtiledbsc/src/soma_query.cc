@@ -14,26 +14,42 @@ SOMAQuery::SOMAQuery(SOMA* soma, std::string name)
     ThreadPool pool{3};
 
     tasks.emplace_back(pool.execute([&]() {
+        std::string name{"obs"};
+        std::string unique_name{name_};
+        if (!name_.empty()) {
+            unique_name += "/" + name;
+        }
         mq_obs_ = std::make_unique<ManagedQuery>(
-            soma->open_array("obs"), name_ + ":obs");
+            soma->open_array(name), unique_name);
         return Status::Ok();
     }));
 
     tasks.emplace_back(pool.execute([&]() {
+        std::string name{"var"};
+        std::string unique_name{name_};
+        if (!name_.empty()) {
+            unique_name += "/" + name;
+        }
         mq_var_ = std::make_unique<ManagedQuery>(
-            soma->open_array("var"), name_ + ":var");
+            soma->open_array(name), unique_name);
         return Status::Ok();
     }));
+
     tasks.emplace_back(pool.execute([&]() {
+        std::string name{"X/data"};
+        std::string unique_name{name_};
+        if (!name_.empty()) {
+            unique_name += "/" + name;
+        }
         mq_x_ = std::make_unique<ManagedQuery>(
-            soma->open_array("X/data"), name_ + ":X/data");
+            soma->open_array(name), unique_name);
         return Status::Ok();
     }));
 
     pool.wait_all(tasks).ok();
 }
 
-std::optional<SOMABuffers> SOMAQuery::next_results() {
+std::optional<MultiArrayBuffers> SOMAQuery::next_results() {
     // Query is complete, return empty results
     if (empty_ || mq_x_->status() == Query::Status::COMPLETE) {
         results_.clear();
@@ -82,14 +98,20 @@ std::optional<SOMABuffers> SOMAQuery::next_results() {
     // Submit X query
     auto num_cells = mq_x_->submit();
     LOG_DEBUG(fmt::format(
-        "[SOMAQuery] [{}] X/data cells read = {}", name_, num_cells));
+        "[SOMAQuery] [{}/X/data] cells read = {}", name_, num_cells));
 
-    // Save results in SOMABuffers
+    // Save results in MultiArrayBuffers
     // TODO: add obs and var results
     results_.clear();
 
+    if (!mq_obs_->results().empty()) {
+        results_[name_ + "/obs"] = mq_obs_->results();
+    }
+    if (!mq_var_->results().empty()) {
+        results_[name_ + "/var"] = mq_var_->results();
+    }
     if (!mq_x_->results().empty()) {
-        results_["X/data"] = mq_x_->results();
+        results_[name_ + "/X/data"] = mq_x_->results();
     }
 
     return results_;

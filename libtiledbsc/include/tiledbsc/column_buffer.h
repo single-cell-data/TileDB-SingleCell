@@ -22,10 +22,7 @@ class ColumnBuffer;  // forward declaration
 using ArrayBuffers = std::map<std::string, std::shared_ptr<ColumnBuffer>>;
 
 // Map: array name -> ArrayBuffers
-using SOMABuffers = std::map<std::string, ArrayBuffers>;
-
-// Map: SOMA name -> SOMABuffers
-using SOCOBuffers = std::map<std::string, SOMABuffers>;
+using MultiArrayBuffers = std::map<std::string, ArrayBuffers>;
 
 /**
  * @brief Class to store data for a TileDB dimension or attribute.

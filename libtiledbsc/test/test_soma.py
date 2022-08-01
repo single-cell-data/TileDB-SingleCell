@@ -27,7 +27,7 @@ def test_soma_query():
         if VERBOSE:
             print("---- CHUNK ----")
             print(chunk)
-        dfs.append(chunk.to_pandas())
+        dfs.append(chunk["soma/X/data"].to_pandas())
 
     df = pd.concat(dfs)
 
@@ -52,7 +52,7 @@ def test_soma_buffer_size():
             if VERBOSE:
                 print("---- CHUNK ----")
                 print(chunk)
-            dfs.append(chunk.to_pandas())
+            dfs.append(chunk["soma/X/data"].to_pandas())
 
         df = pd.concat(dfs)
 
@@ -70,29 +70,43 @@ def test_soma_slice_obs():
     sq.select_obs_attrs(["louvain"])
     sq.set_obs_condition("louvain", "B cells", 4)  # EQ = 4
 
-    table = sq.next_results()
+    dfs = []
     while chunk := sq.next_results():
-        table = pa.concat_tables([table, chunk])
+        if VERBOSE:
+            print("---- CHUNK ----")
+            print(chunk)
+        dfs.append(chunk["soma/X/data"].to_pandas())
 
-    assert len(table) == 628596
+    df = pd.concat(dfs)
+
+    if VERBOSE:
+        print("---- FINAL ----")
+        print(df)
+
+    assert len(df) == 628596
 
 
 def test_soma_slice_var():
-    config = {}
-    # config["config.logging_level"] = "5"
-    # config["soma.init_buffer_bytes"] = f"{1 << 26}"
-
-    soma = sc.SOMA(SOMA_URI, config)
+    soma = sc.SOMA(SOMA_URI)
     sq = soma.query()
 
     sq.select_var_attrs(["n_cells"])
     sq.set_var_condition("n_cells", 50, 0)  # LT = 0
 
-    table = sq.next_results()
+    dfs = []
     while chunk := sq.next_results():
-        table = pa.concat_tables([table, chunk])
+        if VERBOSE:
+            print("---- CHUNK ----")
+            print(chunk)
+        dfs.append(chunk["soma/X/data"].to_pandas())
 
-    assert len(table) == 1308448
+    df = pd.concat(dfs)
+
+    if VERBOSE:
+        print("---- FINAL ----")
+        print(df)
+
+    assert len(df) == 1308448
 
 
 def test_soma_slice_ids():
@@ -104,11 +118,20 @@ def test_soma_slice_ids():
     sq.select_obs_ids(obs_ids)
     sq.select_var_ids(var_ids)
 
-    table = sq.next_results()
+    dfs = []
     while chunk := sq.next_results():
-        table = pa.concat_tables([table, chunk])
+        if VERBOSE:
+            print("---- CHUNK ----")
+            print(chunk)
+        dfs.append(chunk["soma/X/data"].to_pandas())
 
-    assert len(table) == 9
+    df = pd.concat(dfs)
+
+    if VERBOSE:
+        print("---- FINAL ----")
+        print(df)
+
+    assert len(df) == 9
 
 
 if __name__ == "__main__":

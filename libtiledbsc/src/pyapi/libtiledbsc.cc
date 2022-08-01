@@ -105,7 +105,7 @@ PYBIND11_MODULE(libtiledbsc, m) {
             "config"_a = py::none())
         .def("list_arrays", &SOMA::list_arrays)
         // SOMAQuery (0 = return value) will keep SOMA alive (1 = this)
-        .def("query", &SOMA::query, py::keep_alive<0, 1>(), "name"_a = "soma");
+        .def("query", &SOMA::query, py::keep_alive<0, 1>());
 
     py::class_<SOMAQuery>(m, "SOMAQuery")
         .def("select_obs_attrs", &SOMAQuery::select_obs_attrs)
@@ -116,13 +116,20 @@ PYBIND11_MODULE(libtiledbsc, m) {
         .def("set_obs_condition", &SOMAQuery::set_obs_condition<std::string>)
         .def("set_var_condition", &SOMAQuery::set_var_condition<uint64_t>)
         .def("set_var_condition", &SOMAQuery::set_var_condition<std::string>)
-        .def("next_results", [](SOMAQuery& sq) -> std::optional<py::object> {
-            auto buffers = sq.next_results();
-            if (buffers.has_value()) {
-                return to_table(buffers->at("X/data"));
-            }
-            return std::nullopt;
-        });
+        .def(
+            "next_results",
+            [](SOMAQuery& sq)
+                -> std::optional<std::map<std::string, py::object>> {
+                auto buffers = sq.next_results();
+                if (buffers.has_value()) {
+                    std::map<std::string, py::object> results;
+                    for (auto& [name, buffer] : *buffers) {
+                        results[name] = to_table(buffer);
+                    }
+                    return results;
+                }
+                return std::nullopt;
+            });
 
     py::class_<SOMACollection>(m, "SOMACollection")
         .def(

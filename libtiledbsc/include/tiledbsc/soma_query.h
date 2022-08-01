@@ -22,9 +22,9 @@ class SOMAQuery {
      * @brief Construct a new SOMAQuery object
      *
      * @param soma SOMA
-     * @param name Name displayed in log messages
+     * @param name SOMA name
      */
-    SOMAQuery(SOMA* soma, std::string name = "soma");
+    SOMAQuery(SOMA* soma, std::string name);
 
     /**
      * @brief Select obs attributes to materialize.
@@ -99,11 +99,11 @@ class SOMAQuery {
      * incomplete queries, continue to call `next_results` until std::nullopt is
      * returned.
      *
-     * @return std::optional<SOMABuffers> Results or std::nullopt
+     * @return std::optional<MultiArrayBuffers> Results or std::nullopt
      */
-    std::optional<SOMABuffers> next_results();
+    std::optional<MultiArrayBuffers> next_results();
 
-    std::optional<SOMABuffers> results() {
+    std::optional<MultiArrayBuffers> results() {
         if (results_.empty()) {
             return std::nullopt;
         }
@@ -114,8 +114,12 @@ class SOMAQuery {
         return complete_;
     }
 
+    std::string name() {
+        return name_;
+    }
+
    private:
-    // Name displayed in log messages
+    // SOMA name
     std::string name_;
 
     // TileDB context
@@ -131,7 +135,7 @@ class SOMAQuery {
     std::unique_ptr<ManagedQuery> mq_x_;
 
     // Results of last call to next_results.
-    SOMABuffers results_;
+    MultiArrayBuffers results_;
 
     // Mutex to control access to mq_x_
     std::mutex mtx_;

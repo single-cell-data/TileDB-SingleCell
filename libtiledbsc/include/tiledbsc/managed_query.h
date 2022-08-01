@@ -23,7 +23,7 @@ class ManagedQuery {
      * @brief Construct a new Managed Query object
      *
      * @param array TileDB array
-     * @param name Name displayed in log messages
+     * @param name Name of the array
      */
     ManagedQuery(std::shared_ptr<Array> array, std::string name = "array");
 

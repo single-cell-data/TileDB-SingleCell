@@ -14,7 +14,7 @@ static const std::string soma_uri = root + "/test/soco/pbmc3k_processed";
 using namespace tiledb;
 using namespace tiledbsc;
 
-int soma_num_cells(SOMABuffers& soma) {
+int soma_num_cells(MultiArrayBuffers& soma) {
     return soma.begin()->second.begin()->second->size();
 }
 
