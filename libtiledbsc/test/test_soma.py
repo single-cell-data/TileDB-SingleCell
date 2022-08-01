@@ -3,7 +3,7 @@ import pandas as pd
 import pyarrow as pa
 import libtiledbsc as sc
 
-VERBOSE = False
+VERBOSE = True
 
 TEST_DIR = os.path.dirname(__file__)
 SOMA_URI = f"{TEST_DIR}/../../test/soco/pbmc3k_processed"
@@ -18,24 +18,24 @@ def test_soma_list():
     assert len(array_uris) == 19
 
 
-# TODO: Debug this message from pa.concat_tables
-# var_id: [<Invalid array: Length spanned by binary offsets (6010916) larger than values array (size 6010627)>,
 def test_soma_query():
     soma = sc.SOMA(SOMA_URI)
     sq = soma.query()
 
-    table = sq.next_results()
+    dfs = []
     while chunk := sq.next_results():
         if VERBOSE:
             print("---- CHUNK ----")
             print(chunk)
-        table = pa.concat_tables([table, chunk])
+        dfs.append(chunk.to_pandas())
+
+    df = pd.concat(dfs)
 
     if VERBOSE:
         print("---- FINAL ----")
-        print(table)
+        print(df)
 
-    assert len(table) == 4848644
+    assert len(df) == 4848644
 
 
 def test_soma_buffer_size():
@@ -43,17 +43,24 @@ def test_soma_buffer_size():
         config = {}
         config["soma.init_buffer_bytes"] = f"{1 << i}"
         sc.debug(f"SOMA query: {config}")
+
         soma = sc.SOMA(SOMA_URI, config)
         sq = soma.query()
 
-        table = sq.next_results()
+        dfs = []
         while chunk := sq.next_results():
-            table = pa.concat_tables([table, chunk])
+            if VERBOSE:
+                print("---- CHUNK ----")
+                print(chunk)
+            dfs.append(chunk.to_pandas())
+
+        df = pd.concat(dfs)
 
         if VERBOSE:
-            print(table)
+            print("---- FINAL ----")
+            print(df)
 
-        assert len(table) == 4848644
+        assert len(df) == 4848644
 
 
 def test_soma_slice_obs():

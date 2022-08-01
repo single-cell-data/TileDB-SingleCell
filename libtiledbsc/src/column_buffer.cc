@@ -92,7 +92,6 @@ ColumnBuffer::ColumnBuffer(
 ColumnBuffer::~ColumnBuffer(){};
 
 void ColumnBuffer::attach(Query& query) {
-    LOG_DEBUG(fmt::format("Attaching buffer {} to query", name_));
     query.set_data_buffer(name_, data_);
     if (!offsets_.empty()) {
         query.set_offsets_buffer(name_, offsets_);
@@ -168,8 +167,13 @@ std::shared_ptr<ColumnBuffer> ColumnBuffer::alloc(
         // TODO: Handle dense arrays similar to tiledb python module
     }
 
-    auto type_size = tiledb::impl::type_size(type);
-    auto num_cells = num_bytes / type_size;
+    // For variable length column types, allocate an extra num_bytes to hold
+    //   offset values. The number of cells is the set by the size of the
+    //   offset type.
+    // For non-variable length column types, the number of cells is computed
+    //   from the type size.
+    size_t num_cells = is_var ? num_bytes / sizeof(uint64_t) :
+                                num_bytes / tiledb::impl::type_size(type);
 
     auto data = std::vector<std::byte>(num_bytes);
     // TileDB requires num_cells offset values. We allocate num_cells + 1 to

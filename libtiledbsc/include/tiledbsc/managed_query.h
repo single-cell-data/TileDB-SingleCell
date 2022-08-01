@@ -23,8 +23,9 @@ class ManagedQuery {
      * @brief Construct a new Managed Query object
      *
      * @param array TileDB array
+     * @param name Name displayed in log messages
      */
-    ManagedQuery(std::shared_ptr<Array> array);
+    ManagedQuery(std::shared_ptr<Array> array, std::string name = "array");
 
     /**
      * @brief Select columns names to query (dim and attr). If the
@@ -218,6 +219,9 @@ class ManagedQuery {
 
     // TileDB array being queried.
     std::shared_ptr<Array> array_;
+
+    // Name displayed in log messages
+    std::string name_;
 
     // Array schema
     ArraySchema schema_;

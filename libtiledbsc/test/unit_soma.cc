@@ -14,6 +14,10 @@ static const std::string soma_uri = root + "/test/soco/pbmc3k_processed";
 using namespace tiledb;
 using namespace tiledbsc;
 
+int soma_num_cells(SOMABuffers& soma) {
+    return soma.begin()->second.begin()->second->size();
+}
+
 TEST_CASE("SOMA: Open arrays") {
     if (VERBOSE) {
         LOG_CONFIG("debug");
@@ -38,7 +42,7 @@ TEST_CASE("SOMA: Full query") {
 
     size_t total_cells = 0;
     while (auto results = sq->next_results()) {
-        auto num_cells = results->begin()->second->size();
+        auto num_cells = soma_num_cells(*results);
         total_cells += num_cells;
     }
     REQUIRE(total_cells == 4848644);
@@ -59,7 +63,7 @@ TEST_CASE("SOMA: Sliced query (obs)") {
 
     size_t total_cells = 0;
     while (auto results = sq->next_results()) {
-        auto num_cells = results->begin()->second->size();
+        auto num_cells = soma_num_cells(*results);
         total_cells += num_cells;
     }
     REQUIRE(total_cells == 628596);
@@ -81,7 +85,7 @@ TEST_CASE("SOMA: Sliced query (var)") {
 
     size_t total_cells = 0;
     while (auto results = sq->next_results()) {
-        auto num_cells = results->begin()->second->size();
+        auto num_cells = soma_num_cells(*results);
         total_cells += num_cells;
     }
     REQUIRE(total_cells == 1308448);
@@ -99,7 +103,7 @@ TEST_CASE("SOMA: Sliced query (select ids)") {
 
     size_t total_cells = 0;
     while (auto results = sq->next_results()) {
-        auto num_cells = results->begin()->second->size();
+        auto num_cells = soma_num_cells(*results);
         total_cells += num_cells;
     }
     REQUIRE(total_cells == 9);

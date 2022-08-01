@@ -59,7 +59,8 @@ void slice_soma(std::string_view soma_uri) {
 void soco_query(std::string_view soco_uri) {
     Config config;
     // config["config.logging_level"] = "5";
-    config["soma.init_buffer_bytes"] = "8000000";
+    // config["soma.init_buffer_bytes"] = "4294967296";
+    // config["soma.init_buffer_bytes"] = "268435456";
 
     auto soco = SOMACollection::open(soco_uri, config);
     auto sqs = soco->query();
@@ -104,12 +105,7 @@ void soco_query(std::string_view soco_uri) {
 
     while (auto results = sqs->next_results()) {
     }
-    /*
-        for (int i = 0; i < 100; i++) {
-            LOG_DEBUG(fmt::format("Submit #{}", i + 1));
-            sqs->next_results();
-        }
-        */
+
     LOG_DEBUG("Done");
 }
 

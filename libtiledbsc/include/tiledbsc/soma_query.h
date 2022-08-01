@@ -22,8 +22,9 @@ class SOMAQuery {
      * @brief Construct a new SOMAQuery object
      *
      * @param soma SOMA
+     * @param name Name displayed in log messages
      */
-    SOMAQuery(SOMA* soma);
+    SOMAQuery(SOMA* soma, std::string name = "soma");
 
     /**
      * @brief Select obs attributes to materialize.
@@ -109,7 +110,14 @@ class SOMAQuery {
         return results_;
     }
 
+    bool is_complete() {
+        return complete_;
+    }
+
    private:
+    // Name displayed in log messages
+    std::string name_;
+
     // TileDB context
     std::shared_ptr<Context> ctx_;
 
@@ -130,6 +138,9 @@ class SOMAQuery {
 
     // If true, the query is empty because the obs or var query was empty
     bool empty_ = false;
+
+    // If true, the query is complete
+    bool complete_ = false;
 
     /**
      * @brief Submit a query (obs or var) and use the results to slice

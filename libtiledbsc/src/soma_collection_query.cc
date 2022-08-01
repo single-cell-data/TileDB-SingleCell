@@ -13,7 +13,7 @@ SOMACollectionQuery::SOMACollectionQuery(SOMACollection* soco) {
 
     for (auto& [name, soma] : soco->get_somas()) {
         LOG_DEBUG(fmt::format("Get SOMA query: {}", name));
-        soma_queries_[name] = soma->query();
+        soma_queries_[name] = soma->query(name);
     }
 }
 
@@ -26,12 +26,14 @@ std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
     ThreadPool pool{threads_};
 
     for (auto& [name, sq] : soma_queries_) {
-        LOG_DEBUG(
-            fmt::format("[SOMACollectionQuery] Queue query for {}", name));
-        tasks.emplace_back(pool.execute([&]() {
-            sq->next_results();
-            return Status::Ok();
-        }));
+        if (!sq->is_complete()) {
+            LOG_DEBUG(
+                fmt::format("[SOMACollectionQuery] Queue query for {}", name));
+            tasks.emplace_back(pool.execute([&]() {
+                sq->next_results();
+                return Status::Ok();
+            }));
+        }
     }
 
     // Block until all tasks complete
@@ -46,7 +48,7 @@ std::optional<SOCOBuffers> SOMACollectionQuery::next_results() {
             LOG_DEBUG(fmt::format(
                 "[SOMACollectionQuery] SOMA {} has {} results.",
                 name,
-                sq->results()->size()));
+                sq->results()->begin()->second.begin()->second->size()));
             results[name] = *sq->results();
         }
     }

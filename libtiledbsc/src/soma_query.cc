@@ -7,22 +7,26 @@
 namespace tiledbsc {
 using namespace tiledb;
 
-SOMAQuery::SOMAQuery(SOMA* soma)
-    : ctx_(soma->context()) {
+SOMAQuery::SOMAQuery(SOMA* soma, std::string name)
+    : name_(name)
+    , ctx_(soma->context()) {
     std::vector<ThreadPool::Task> tasks;
     ThreadPool pool{3};
 
     tasks.emplace_back(pool.execute([&]() {
-        mq_obs_ = std::make_unique<ManagedQuery>(soma->open_array("obs"));
+        mq_obs_ = std::make_unique<ManagedQuery>(
+            soma->open_array("obs"), name_ + ":obs");
         return Status::Ok();
     }));
 
     tasks.emplace_back(pool.execute([&]() {
-        mq_var_ = std::make_unique<ManagedQuery>(soma->open_array("var"));
+        mq_var_ = std::make_unique<ManagedQuery>(
+            soma->open_array("var"), name_ + ":var");
         return Status::Ok();
     }));
     tasks.emplace_back(pool.execute([&]() {
-        mq_x_ = std::make_unique<ManagedQuery>(soma->open_array("X/data"));
+        mq_x_ = std::make_unique<ManagedQuery>(
+            soma->open_array("X/data"), name_ + ":X/data");
         return Status::Ok();
     }));
 
@@ -32,13 +36,15 @@ SOMAQuery::SOMAQuery(SOMA* soma)
 std::optional<SOMABuffers> SOMAQuery::next_results() {
     // Query is complete, return empty results
     if (empty_ || mq_x_->status() == Query::Status::COMPLETE) {
+        results_.clear();
+        complete_ = true;
         return std::nullopt;
     }
 
     // Abort if an invalid column was selected for the obs or var query.
     if (mq_obs_->is_invalid() || mq_var_->is_invalid()) {
-        LOG_DEBUG(
-            fmt::format("[SOMAQuery] Abort due to invalid selected column."));
+        LOG_DEBUG(fmt::format(
+            "[SOMAQuery] [{}] Abort due to invalid selected column.", name_));
         return std::nullopt;
     }
 
@@ -63,7 +69,9 @@ std::optional<SOMABuffers> SOMAQuery::next_results() {
         // Return empty results if obs or var query was empty
         if (!mq_obs_->total_num_cells() || !mq_var_->total_num_cells()) {
             LOG_DEBUG(fmt::format(
-                "Obs or var query was empty: obs num cells={} var num cells={}",
+                "[SOMAQuery] [{}] Obs or var query was empty: obs num cells={} "
+                "var num cells={}",
+                name_,
                 mq_obs_->total_num_cells(),
                 mq_var_->total_num_cells()));
             empty_ = true;
@@ -73,7 +81,8 @@ std::optional<SOMABuffers> SOMAQuery::next_results() {
 
     // Submit X query
     auto num_cells = mq_x_->submit();
-    LOG_DEBUG(fmt::format("*** X cells read = {}", num_cells));
+    LOG_DEBUG(fmt::format(
+        "[SOMAQuery] [{}] X/data cells read = {}", name_, num_cells));
 
     // Save results in SOMABuffers
     // TODO: add obs and var results
@@ -94,7 +103,8 @@ void SOMAQuery::query_and_select(
     while (!mq->is_complete()) {
         // Submit the query.
         auto num_cells = mq->submit();
-        LOG_DEBUG(fmt::format("*** {} cells read = {}", dim_name, num_cells));
+        LOG_DEBUG(fmt::format(
+            "[SOMAQuery] [{}] {} cells read = {}", name_, dim_name, num_cells));
 
         // If the mq query was sliced and the read returned results, apply the
         // results to the X query.
@@ -116,7 +126,10 @@ void SOMAQuery::query_and_select(
     }
 
     LOG_DEBUG(fmt::format(
-        "*** {} total cells read = {}", dim_name, mq->total_num_cells()));
+        "[SOMAQuery] [{}] {} total cells read = {}",
+        name_,
+        dim_name,
+        mq->total_num_cells()));
 }
 
 }  // namespace tiledbsc
